@@ -1,115 +1,55 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col>
-        <v-file-input label="File input" v-model="photo" prepend-icon="mdi-camera"></v-file-input>
-        <input type="file" @change="(event) => uploadPhoto(event.target.files)" accept="image/*" />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="4">
-        <v-list-subheader>What's the name?</v-list-subheader>
-      </v-col>
-
-      <v-col cols="12" sm="6" md="4">
-        <v-text-field label="name" v-model="name" placeholder="Yummy"></v-text-field>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="4">
-        <v-list-subheader>For how many people?</v-list-subheader>
-      </v-col>
-
-      <v-col cols="8">
-        <v-text-field label="Portion" v-model="portion" suffix="per person"></v-text-field>
-      </v-col>
-    </v-row>
-
-    <!-- https://codepen.io/kaelwd/pen/ZEYWvMQ -->
-    <v-row>
-      <v-col cols="4">
-        <v-list-subheader>Ingredients</v-list-subheader>
-      </v-col>
-
-      <v-col>
-        <v-combobox
-          v-model="ingredients"
-          v-model:search="search"
-          :hide-no-data="false"
-          :items="items"
-          hide-selected
-          hint="cucumber, chicken..."
-          label="ingredients"
-          multiple
-          persistent-hint
-          small-chips
-        >
-          <template v-slot:no-data>
-            <v-list-item>
-              <v-list-item-title>
-                No results matching "<strong>{{ search }}</strong
-                >". Press <kbd>enter</kbd> to create a new one
-              </v-list-item-title>
-            </v-list-item>
-          </template>
-        </v-combobox>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="4">
-        <v-list-subheader>How much time is it gonna take?</v-list-subheader>
-      </v-col>
-
-      <v-col cols="8">
-        <v-text-field label="time" v-model="time"></v-text-field>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="4">
-        <v-list-subheader>How much does it cost?</v-list-subheader>
-      </v-col>
-
-      <v-col cols="8">
-        <v-text-field label="Amount" v-model="cost" prefix="֏"></v-text-field>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="4">
-        <v-list-subheader>Notes</v-list-subheader>
-      </v-col>
-      <v-col cols="8">
-        <v-textarea label="Like how should we cook it?" v-model="process"></v-textarea>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="saveDish">
-        That's it
-      </v-btn>
-
-      <v-btn
-        class="mb-8"
-        size="large"
-        v-if="!editPageId"
-        @click="
-          () => {
-            saveDish()
-            resetValues()
-          }
-        "
+  <v-container cols="8">
+    <v-form>
+      <v-file-input label="Photo" v-model="photo" prepend-icon="mdi-camera" />
+      <v-text-field label="What's the name?" v-model="name" placeholder="Yummy" />
+      <v-text-field label="For how many people?" v-model="portion" suffix="people" />
+      <v-combobox
+        v-model="ingredients"
+        v-model:search="search"
+        :hide-no-data="false"
+        :items="items"
+        hide-selected
+        label="Ingredients"
+        multiple
+        small-chips
       >
-        Save and add another!
-      </v-btn>
-    </v-row>
+        <template v-slot:no-data>
+          <v-list-item>
+            <v-list-item-title>
+              <strong>{{ search }}</strong> Press <kbd>enter</kbd> to create a new one
+            </v-list-item-title>
+          </v-list-item>
+        </template>
+      </v-combobox>
+      <v-text-field label="How much time is it gonna take?" v-model="time" />
+      <v-text-field label="How much does it cost?" v-model="cost" prefix="֏" />
+      <v-textarea label="Notes?" v-model="process"></v-textarea>
+      <v-row>
+        <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="saveDish">
+          That's it
+        </v-btn>
+
+        <v-btn
+          class="mb-8"
+          size="large"
+          v-if="!editPageId"
+          @click="
+            () => {
+              saveDish()
+              resetValues()
+            }
+          "
+        >
+          Save and add another!
+        </v-btn>
+      </v-row>
+    </v-form>
   </v-container>
 </template>
 
 <script setup>
-// shot the data https://vuetifyjs.com/en/components/data-tables/slots/#group-header-slot
+// show the data https://vuetifyjs.com/en/components/data-tables/slots/#group-header-slot
 
 import { db } from '@/firebase.js'
 import { ref, onMounted } from 'vue'
@@ -139,7 +79,7 @@ const ingredients = ref([])
 const search = ref('')
 const process = ref('')
 const time = ref('')
-const portion = ref(2)
+const portion = ref()
 const editPageId = route.params.dish
 const photo = ref('')
 
