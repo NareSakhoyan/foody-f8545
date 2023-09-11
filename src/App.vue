@@ -5,15 +5,24 @@
         <v-row align="center">
           <v-col>
             <h3 v-if="user">{{ `Heeey ${user?.displayName}!` }}</h3>
-            <v-switch v-model="themeToggle" hide-details inset label="Theme"></v-switch>
+            <v-switch
+              v-model="themeToggle"
+              hide-details
+              inset
+              label="Theme"
+            ></v-switch>
           </v-col>
           <Login />
         </v-row>
       </v-container>
     </v-app-bar>
 
-    <v-main class="d-flex align-center justify-center" style="min-height: 300px">
+    <v-main
+      class="d-flex align-center justify-center"
+      style="min-height: 300px"
+    >
       <RouterView />
+      <SnackBar />
     </v-main>
 
     <v-footer class="coral" app> Your feedback is important! </v-footer>
@@ -24,6 +33,7 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useTheme } from 'vuetify'
 import Login from '@components/LogIn.vue'
+import SnackBar from '@components/SnackBar.vue'
 
 const theme = useTheme()
 const themeToggle = ref(false)
@@ -42,5 +52,8 @@ onMounted(() => {
   // To unsubscribe from the watcher when the component unmounts
   onBeforeUnmount(unsubscribe)
 })
-watch(themeToggle, (value) => (theme.global.name.value = value ? 'light' : 'dark'))
+watch(
+  themeToggle,
+  (value) => (theme.global.name.value = value ? 'light' : 'dark')
+)
 </script>

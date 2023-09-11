@@ -4,7 +4,12 @@
     <template v-slot:activator="{ props }">
       <v-btn append-icon="mdi-account-circle" v-bind="props"> Log in </v-btn>
     </template>
-    <v-card class="mx-auto pa-12 pb-8 mb-12" elevation="8" width="448" rounded="lg">
+    <v-card
+      class="mx-auto pa-12 pb-8 mb-12"
+      elevation="8"
+      width="448"
+      rounded="lg"
+    >
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
       <v-text-field
@@ -24,7 +29,9 @@
         required
       ></v-text-field>
 
-      <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
+      <div
+        class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
+      >
         Password
 
         <a
@@ -75,13 +82,11 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile
-} from 'firebase/auth'
+import { useAuthStore } from '@/store'
+import { storeToRefs } from 'pinia'
+
+const store = useAuthStore()
+const { user } = storeToRefs(store)
 
 const loginOverlay = ref(false)
 const visible = ref(false)
@@ -89,60 +94,35 @@ const signup = ref(false)
 const name = ref('')
 const email = ref('')
 const password = ref('')
-const error = ref(null)
-const user = ref(null)
 
-const auth = getAuth()
-
-const signIn = () => {
-  signInWithEmailAndPassword(auth, email.value, password.value)
-    .then((data) => {
-      console.log('succesfully logged in: ', data)
-      loginOverlay.value = false
-    })
-    .catch((err) => {
-      error.value = err.message
-    })
+const signIn = async () => {
+  try {
+    await store.login(email.value, password.value)
+    loginOverlay.value = false
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-const signUp = () => {
-  createUserWithEmailAndPassword(auth, email.value, password.value)
-    .then((user) => {
-      console.log('email password created succefully: ', user)
-      loginOverlay.value = false
-      updateProfile(auth.currentUser, {
-        displayName: name.value
-      })
-        .then(() => {
-          // Profile updated!
-          // ...
-          console.log('updated user info, name: ', user.displayName)
-        })
-        .catch((error) => {
-          // An error occurred
-          // ...
-          console.log(error)
-        })
-    })
-    .catch((err) => {
-      error.value = err.message
-    })
+const signUp = async () => {
+  try {
+    await store.signUp(name.value, email.value, password.value)
+    loginOverlay.value = false
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-const handleAuthStateChanged = (firebaseUser) => {
-  user.value = firebaseUser
+const logOut = async () => {
+  try {
+    await store.logOut()
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-const logOut = () => {
-  signOut(auth).catch((err) => {
-    error.value = err.message
-  })
-}
-
-// Watch for changes in authentication state
 onMounted(() => {
-  const unsubscribe = auth.onAuthStateChanged(handleAuthStateChanged)
-  // To unsubscribe from the watcher when the component unmounts
+  const unsubscribe = store.setup()
   onBeforeUnmount(unsubscribe)
 })
 </script>

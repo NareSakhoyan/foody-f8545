@@ -39,7 +39,12 @@
           </v-list-item>
 
           <v-list-item>
-            <v-switch v-model="hints" color="purple" label="Enable hints" hide-details></v-switch>
+            <v-switch
+              v-model="hints"
+              color="purple"
+              label="Enable hints"
+              hide-details
+            ></v-switch>
           </v-list-item>
         </v-list>
 
@@ -47,7 +52,9 @@
           <v-spacer></v-spacer>
 
           <v-btn variant="text" @click="menu = false"> Cancel </v-btn>
-          <v-btn color="primary" variant="text" @click="menu = false"> Save </v-btn>
+          <v-btn color="primary" variant="text" @click="menu = false">
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-menu>

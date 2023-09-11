@@ -3,7 +3,10 @@
     <v-img
       class="align-end text-white"
       height="200"
-      :src="props.details.photo || 'https://placehold.co/3840x2160.png?text=Good+Food'"
+      :src="
+        props.details.photo ||
+        'https://placehold.co/3840x2160.png?text=Good+Food'
+      "
       cover
     >
       <v-card-title>{{ props.details.name }}</v-card-title>
@@ -29,10 +32,18 @@
     </div>
 
     <v-card-actions>
-      <v-btn prepend-icon="mdi-pencil-outline" size="small" :to="`/dish/${props.details.id}`">
+      <v-btn
+        prepend-icon="mdi-pencil-outline"
+        size="small"
+        :to="`/dish/${props.details.id}`"
+      >
         Edit
       </v-btn>
-      <v-btn prepend-icon="mdi-delete" size="small" @click="() => deleteDish(props.details.id)">
+      <v-btn
+        prepend-icon="mdi-delete"
+        size="small"
+        @click="() => deleteDish(props.details.id)"
+      >
         Delete
       </v-btn>
 
@@ -57,14 +68,11 @@
   </v-card>
 </template>
 <script setup>
-import { doc, deleteDoc } from 'firebase/firestore'
-import { db } from '../firebase'
 import { ref } from 'vue'
+import { useDishStore } from '@/store'
+
 const props = defineProps(['details'])
-
+const store = useDishStore()
 const show = ref(false)
-
-const deleteDish = async (id) => {
-  await deleteDoc(doc(db, 'dishes', id))
-}
+const { deleteDish } = store
 </script>

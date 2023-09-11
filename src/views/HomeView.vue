@@ -34,7 +34,15 @@ import Filters from '@components/FilterOptions.vue'
 import DishList from '@components/DishList.vue'
 
 const loading = ref(false)
-const tags = ref(['spicy', 'chicken', 'vegatables', 'quick', 'breakfast', 'dinner'])
+const tags = ref([
+  'spicy',
+  'chicken',
+  'vegatables',
+  'quick',
+  'breakfast',
+  'dinner',
+  'soup',
+])
 const searchText = ref('')
 
 const search = () => {

@@ -22,7 +22,7 @@ const firebaseConfig = {
   storageBucket: 'foody-f8545.appspot.com',
   messagingSenderId: '1040216597893',
   appId: '1:1040216597893:web:72e18b0d4ce0d478e990ec',
-  measurementId: 'G-13F5MXPTLC'
+  measurementId: 'G-13F5MXPTLC',
 }
 
 // Initialize Firebase

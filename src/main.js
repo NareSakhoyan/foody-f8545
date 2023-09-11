@@ -16,9 +16,13 @@ import { aliases, mdi } from 'vuetify/lib/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 
+import { createPinia } from 'pinia'
+
+const pinia = createPinia()
+
 const vuetify = createVuetify({
   theme: {
-    defaultTheme: 'dark'
+    defaultTheme: 'dark',
   },
   components,
   directives,
@@ -27,9 +31,9 @@ const vuetify = createVuetify({
     aliases,
     sets: {
       mdi,
-      fa
-    }
-  }
+      fa,
+    },
+  },
 })
 
 const app = createApp(App)
@@ -37,5 +41,6 @@ const app = createApp(App)
 app.use(firebaseApp)
 app.use(router)
 app.use(vuetify)
+app.use(pinia)
 
 app.mount('#app')
