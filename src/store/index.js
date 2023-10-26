@@ -64,10 +64,15 @@ export const useDishStore = defineStore('dish', {
   },
   actions: {
     setup() {
-      const q = query(collection(db, 'dishes'))
-
+      this.getDishes()
+    },
+    getDishes(filters = {}) {
       onSnapshot(
-        q,
+        query(
+          collection(db, 'dishes'),
+          filters?.quickFilters?.length &&
+            where('filters', 'array-contains-any', filters.quickFilters)
+        ),
         (querySnapshot) => {
           const arr = []
           querySnapshot.forEach((item) => {
@@ -79,9 +84,6 @@ export const useDishStore = defineStore('dish', {
           setSnackBarMessage(error.message, 'error')
         }
       )
-    },
-    getDishes(filters = {}) {
-      // todo firebase call
     },
     async getDish(id) {
       try {
