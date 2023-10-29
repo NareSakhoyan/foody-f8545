@@ -9,7 +9,7 @@
       color="blue"
       size="large"
       variant="tonal"
-      :to="`/dish/`"
+      :to="`/dish/edit`"
     >
       Add another one!
     </v-btn>

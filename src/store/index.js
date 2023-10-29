@@ -18,6 +18,14 @@ import {
 } from 'firebase/firestore'
 import { db } from '@/firebase.js'
 import { auth } from '@/firebase.js'
+import {
+  getStorage,
+  ref as firebaseRef,
+  uploadBytes,
+  getDownloadURL,
+} from 'firebase/storage'
+
+const storage = getStorage()
 
 export const useSnackBar = defineStore('snackbar', {
   state: () => ({
@@ -121,7 +129,18 @@ export const useDishStore = defineStore('dish', {
         snackbar.setMessage(error.message, 'error')
       }
     },
-
+    async uploadPhoto(photoToUpload) {
+      if (!photoToUpload) return null
+      const storageRef = firebaseRef(storage, `${photoToUpload.name}`)
+      try {
+        await uploadBytes(storageRef, photoToUpload)
+        const downloadURL = await getDownloadURL(storageRef)
+        return downloadURL
+      } catch (error) {
+        const snackbar = useSnackBar()
+        snackbar.setMessage(error.message, 'error')
+      }
+    },
     filter() {
       // todo handle filters
       return this.dishes.map((item) => item)
@@ -137,15 +156,6 @@ export const useAuthStore = defineStore('auth', {
     currentUser: (state) => state.user,
   },
   actions: {
-    // async setup() {
-    //     // ...
-    //     //🌟 Sync Pinia's state and Firestore document
-    //     onSnapshot(docRef, (ds) => {
-    //         if (ds.exists()) {
-    //             this.$patch({ docData: ds.data() })
-    //         }
-    //     })
-    // }
     async setup() {
       const unsubscribe = auth.onAuthStateChanged(
         (firebaseUser) => (this.user = firebaseUser)

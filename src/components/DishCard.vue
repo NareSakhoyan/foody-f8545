@@ -9,6 +9,11 @@
       "
       cover
     >
+      <v-btn
+        class="favorite"
+        :icon="favorite ? 'mdi-heart' : 'mdi-heart-outline'"
+        @click="() => (favorite = !favorite)"
+      ></v-btn>
       <v-card-title>{{ props.details.name }}</v-card-title>
     </v-img>
 
@@ -31,31 +36,6 @@
       </v-list-item>
     </div>
 
-    <v-card-actions>
-      <v-btn
-        prepend-icon="mdi-pencil-outline"
-        size="small"
-        :to="`/dish/${props.details.id}`"
-      >
-        Edit
-      </v-btn>
-      <v-btn
-        prepend-icon="mdi-delete"
-        size="small"
-        @click="() => deleteDish(props.details.id)"
-      >
-        Delete
-      </v-btn>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        v-if="props.details.proces"
-        :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        @click="show = !show"
-      ></v-btn>
-    </v-card-actions>
-
     <v-expand-transition v-if="props.details.process">
       <div v-show="show">
         <v-divider></v-divider>
@@ -65,14 +45,29 @@
         </v-card-text>
       </div>
     </v-expand-transition>
+    <v-card-actions>
+      <v-btn size="small" :to="`/dish/${props.details.id}`"> More </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn
+        v-if="props.details.proces"
+        :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        @click="show = !show"
+      ></v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 <script setup>
 import { ref } from 'vue'
-import { useDishStore } from '@/store'
-
+const favorite = ref(false)
 const props = defineProps(['details'])
-const store = useDishStore()
 const show = ref(false)
-const { deleteDish } = store
 </script>
+<style>
+.favorite {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0.5rem;
+  z-index: 1;
+}
+</style>

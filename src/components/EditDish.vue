@@ -1,7 +1,29 @@
 <template>
-  <v-container cols="8">
+  <v-container>
     <v-form>
-      <v-file-input label="Photo" v-model="photo" prepend-icon="mdi-camera" />
+      <v-img
+        v-if="photo"
+        class="mx-auto"
+        height="300"
+        lazy-src="https://placehold.co/3840x2160.png?text=Good+Food"
+        max-width="500"
+        :src="downloadURL"
+      >
+        <template v-slot:placeholder>
+          <div class="d-flex align-center justify-center fill-height">
+            <v-progress-circular
+              color="grey-lighten-4"
+              indeterminate
+            ></v-progress-circular>
+          </div>
+        </template>
+      </v-img>
+      <v-file-input
+        label="Photo"
+        v-model="photo"
+        prepend-icon="mdi-camera"
+        @change="photoInput"
+      />
       <v-text-field
         label="What's the name?"
         v-model="currentDish.name"
@@ -13,7 +35,7 @@
         suffix="people"
       />
       <v-combobox
-        v-model="currentDish.ingredients.value"
+        v-model="ingredients"
         v-model:search="searchIngredient"
         :hide-no-data="false"
         :items="items"
@@ -21,6 +43,8 @@
         label="Ingredients"
         multiple
         small-chips
+        item-text="title"
+        item-value="title"
       >
         <template v-slot:no-data>
           <v-list-item>
@@ -31,11 +55,37 @@
           </v-list-item>
         </template>
       </v-combobox>
+      <v-list v-if="ingredients.length" class="ingredientsList">
+        <v-list-item v-for="(ingr, index) in ingredients" :key="ingr">
+          <v-row>
+            <v-col cols="xs-12 sm-4">
+              <v-list-subheader>{{ ingr.title }}</v-list-subheader>
+            </v-col>
+            <v-col cols="xs-6 sm-4">
+              <v-text-field
+                label="Amount"
+                :model-value="ingr.amount"
+                :suffix="ingr.unitName"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="xs-6 sm-4">
+              <v-select
+                :items="unitNames"
+                density="compact"
+                label="unit"
+                @update:modelValue="(value) => (ingr.unitName = value)"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-divider v-if="ingredients.length - 1 != index" />
+        </v-list-item>
+      </v-list>
       <v-combobox
         v-model="currentDish.filters.value"
         v-model:search="searchfilter"
         :hide-no-data="false"
-        :items="items"
+        :items="quickFilters"
         hide-selected
         label="Filters"
         multiple
@@ -53,6 +103,7 @@
       <v-text-field
         label="How much time is it gonna take?"
         v-model="currentDish.time"
+        suffix="minutes"
       />
       <v-text-field
         label="How much does it cost?"
@@ -93,47 +144,52 @@
 <script setup>
 // show the data https://vuetifyjs.com/en/components/data-tables/slots/#group-header-slot
 
-import { ref, onMounted } from 'vue'
-import {
-  getStorage,
-  ref as firebaseRef,
-  uploadBytes,
-  getDownloadURL,
-} from 'firebase/storage'
+import { ref, onMounted, watch } from 'vue'
 import { deepUnref } from 'vue-deepunref'
-import { useDishStore } from '@/store'
+import { useDishStore, useAuthStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { getAuth } from 'firebase/auth'
-
-const storage = getStorage()
-const auth = getAuth()
-
-const user = auth.currentUser
 
 const route = useRoute()
 const router = useRouter()
 
-const items = ref(['cucumber', 'chicken', 'potato'])
-
 const store = useDishStore()
-const { getDish, addDish, updateDish } = store
+const { getDish, addDish, updateDish, uploadPhoto } = store
 const { currentDish } = storeToRefs(store)
 
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
+
+// Load ingredients from a data store.
+const items = ref(['cucumber', 'chicken', 'potato'])
+const unitNames = ref(['gr', 'kg', 'piece', 'box', 'l', 'ml', 'tbsp', 'tsp'])
+const quickFilters = ref([
+  'spicy',
+  'chicken',
+  'vegatables',
+  'quick',
+  'breakfast',
+  'dinner',
+  'soup',
+])
+
+const ingredients = ref([])
 const searchIngredient = ref('')
 const searchfilter = ref('')
 const editPageId = route.params.dish
 const photo = ref('')
+const downloadURL = ref('')
 
 onMounted(async () => {
   if (editPageId) {
     await getDish(route.params.dish)
   }
 })
+
 const saveDish = async () => {
-  const downloadURL = photo?.value[0] ? await uploadPhoto(photo.value[0]) : ''
-  currentDish.value.user = user.uid
-  currentDish.value.photo = downloadURL
+  currentDish.value.user = user.value.uid
+  currentDish.value.photo = downloadURL.value
+  currentDish.value.ingredients = ingredients
   if (editPageId) {
     await updateDish(editPageId, deepUnref(currentDish))
   } else {
@@ -143,15 +199,31 @@ const saveDish = async () => {
   router.push('/')
 }
 
-// todo: move this to store
-const uploadPhoto = async (photo) => {
-  const storageRef = firebaseRef(storage, `${photo.name}`)
-  try {
-    await uploadBytes(storageRef, photo)
-    const downloadURL = await getDownloadURL(storageRef)
-    return downloadURL
-  } catch (error) {
-    console.error('Error uploading image:', error.message)
-  }
+const photoInput = async () => {
+  if (!photo?.value[0]) return null
+  downloadURL.value = await uploadPhoto(photo?.value[0])
 }
+
+// When an ingredient is added, its value is changed to an object containing the amount and unit name properties.
+watch(ingredients, (value, oldValue) => {
+  console.log(value, oldValue)
+  if (value.length < oldValue.length) return
+  const lastItem = value.pop()
+  if (
+    lastItem.trim() &&
+    !ingredients.value.find((item) => item.title == lastItem)
+  ) {
+    ingredients.value.push({
+      title: lastItem,
+      amount: 1,
+      unitName: '',
+    })
+  }
+})
 </script>
+
+<style>
+.ingredientsList {
+  margin-bottom: 1.25rem;
+}
+</style>
