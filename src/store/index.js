@@ -56,6 +56,7 @@ export const useDishStore = defineStore('dish', {
     dishes: [],
     filters: [],
     currentDish: {
+      id: null,
       name: null,
       cost: null,
       ingredients: [],
@@ -99,6 +100,7 @@ export const useDishStore = defineStore('dish', {
         const data = result.data()
         data.ingredients ??= []
         data.filters ??= []
+        data.id ??= id
         this.currentDish = data
       } catch (error) {
         const snackbar = useSnackBar()

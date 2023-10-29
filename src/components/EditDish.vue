@@ -2,7 +2,7 @@
   <v-container>
     <v-form ref="form">
       <v-img
-        v-if="photo"
+        v-if="photo || currentDish.photo"
         class="mx-auto"
         height="300"
         lazy-src="https://placehold.co/3840x2160.png?text=Good+Food"
@@ -186,6 +186,9 @@ const downloadURL = ref('')
 onMounted(async () => {
   if (editPageId) {
     await getDish(route.params.dish)
+    downloadURL.value = currentDish.value.photo
+    ingredients.value = currentDish.value.ingredients
+    console.log(1111111, currentDish.value, downloadURL.value)
   }
 })
 
@@ -213,10 +216,11 @@ const photoInput = async () => {
 // When an ingredient is added, its value is changed to an object containing the amount and unit name properties.
 watch(ingredients, (value, oldValue) => {
   console.log(value, oldValue)
-  if (value.length < oldValue.length) return
+  if (value.length < oldValue.length || typeof value[value.length] !== 'string')
+    return
   const lastItem = value.pop()
   if (
-    lastItem.trim() &&
+    lastItem?.trim() &&
     !ingredients.value.find((item) => item.title == lastItem)
   ) {
     ingredients.value.push({

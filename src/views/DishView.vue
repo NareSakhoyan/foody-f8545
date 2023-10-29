@@ -44,14 +44,14 @@
         <v-btn
           prepend-icon="mdi-pencil-outline"
           size="small"
-          :to="`/dish/edit/${currentDish.ObjectId}`"
+          :to="`/dish/edit/${currentDish.id}`"
         >
           Edit
         </v-btn>
         <v-btn
           prepend-icon="mdi-delete"
           size="small"
-          @click="() => deleteDish(currentDish.ObjectId)"
+          @click="() => deleteDish(currentDish.id)"
         >
           Delete
         </v-btn>
