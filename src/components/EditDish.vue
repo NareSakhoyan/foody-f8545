@@ -40,7 +40,7 @@
         v-model="ingredients"
         v-model:search="searchIngredient"
         :hide-no-data="false"
-        :items="items"
+        :items="allIngredients"
         hide-selected
         label="Ingredients"
         multiple
@@ -158,13 +158,12 @@ const router = useRouter()
 
 const store = useDishStore()
 const { getDish, addDish, updateDish, uploadPhoto } = store
-const { currentDish } = storeToRefs(store)
+const { currentDish, allIngredients } = storeToRefs(store)
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
 
 // Load ingredients from a data store.
-const items = ref(['cucumber', 'chicken', 'potato'])
 const unitNames = ref(['gr', 'kg', 'piece', 'box', 'l', 'ml', 'tbsp', 'tsp'])
 const quickFilters = ref([
   'spicy',
@@ -188,7 +187,6 @@ onMounted(async () => {
     await getDish(route.params.dish)
     downloadURL.value = currentDish.value.photo
     ingredients.value = currentDish.value.ingredients
-    console.log(1111111, currentDish.value, downloadURL.value)
   }
 })
 
@@ -216,19 +214,25 @@ const photoInput = async () => {
 // When an ingredient is added, its value is changed to an object containing the amount and unit name properties.
 watch(ingredients, (value, oldValue) => {
   console.log(value, oldValue)
-  if (value.length < oldValue.length || typeof value[value.length] !== 'string')
-    return
-  const lastItem = value.pop()
+  if (value.length < oldValue.length) return
+  const lastItem = value[value.length - 1]
   if (
+    typeof lastItem === 'string' &&
     lastItem?.trim() &&
     !ingredients.value.find((item) => item.title == lastItem)
   ) {
-    ingredients.value.push({
+    ingredients.value.splice(-1, 1, {
       title: lastItem,
       amount: 1,
       unitName: '',
     })
   }
+  console.log(
+    22222,
+    'cahnged ingredients: ',
+    typeof lastItem,
+    ingredients.value
+  )
 })
 
 // Form validation

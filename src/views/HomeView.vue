@@ -56,15 +56,11 @@ import { deepUnref } from 'vue-deepunref'
 import Filters from '@components/FilterOptions.vue'
 import DishList from '@components/DishList.vue'
 import { useDishStore } from '@/store'
-import algoliasearch from 'algoliasearch/lite'
 import { history } from 'instantsearch.js/es/lib/routers'
 import { singleIndex } from 'instantsearch.js/es/lib/stateMappings'
 import router from '@/router'
+import { searchClient, index } from '@/query'
 
-const APP_ID = import.meta.env.VITE_APP_ID
-const API_KEY = import.meta.env.VITE_API_KEY
-
-const searchClient = algoliasearch(APP_ID, API_KEY)
 const routing = {
   router: history(),
   stateMapping: singleIndex('text'),
@@ -74,8 +70,6 @@ const store = useDishStore()
 
 const loading = ref(false)
 const hits = ref([])
-
-const index = searchClient.initIndex('text')
 
 const onInput = async () => {
   loading.value = true

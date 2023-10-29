@@ -50,11 +50,14 @@ const setSnackBarMessage = (msg) => {
   snackBarStore.setMessage(msg, 'error')
 }
 
+import { index } from '@/query'
+
 export const useDishStore = defineStore('dish', {
   state: () => ({
     user: null,
     dishes: [],
     filters: [],
+    allIngredients: [],
     currentDish: {
       id: null,
       name: null,
@@ -72,8 +75,19 @@ export const useDishStore = defineStore('dish', {
     currentUser: (state) => state.user,
   },
   actions: {
-    setup() {
+    async setup() {
       this.getDishes()
+
+      // TODO find a better way to fetch all the ingredients
+      const { hits } = await index.search('')
+      const ingrs = hits.reduce(
+        (acc, { ingredients }) => [...acc, ...ingredients],
+        []
+      )
+      this.allIngredients = ingrs
+        .map(({ title }) => title)
+        .filter((item) => item)
+      console.log(11111111, this.allIngredients)
     },
     getDishes(filters = {}) {
       onSnapshot(
