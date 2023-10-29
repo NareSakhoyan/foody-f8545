@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-form>
+    <v-form ref="form">
       <v-img
         v-if="photo"
         class="mx-auto"
@@ -28,10 +28,12 @@
         label="What's the name?"
         v-model="currentDish.name"
         placeholder="Yummy"
+        :rules="rules.name"
       />
       <v-text-field
         label="For how many people?"
         v-model="currentDish.portion"
+        :rules="rules.portion"
         suffix="people"
       />
       <v-combobox
@@ -45,6 +47,7 @@
         small-chips
         item-text="title"
         item-value="title"
+        :rules="rules.ingredients"
       >
         <template v-slot:no-data>
           <v-list-item>
@@ -187,6 +190,9 @@ onMounted(async () => {
 })
 
 const saveDish = async () => {
+  const { valid } = await form.value.validate()
+  if (!valid) return
+
   currentDish.value.user = user.value.uid
   currentDish.value.photo = downloadURL.value
   currentDish.value.ingredients = ingredients
@@ -220,6 +226,29 @@ watch(ingredients, (value, oldValue) => {
     })
   }
 })
+
+// Form validation
+const form = ref()
+const rules = {
+  name: [
+    (value) => {
+      if (value?.length > 3) return true
+      return 'I need the name'
+    },
+  ],
+  portion: [
+    (value) => {
+      if (value && parseInt(value) > 0) return true
+      return "It's gonna be for at least one person, isn't it?"
+    },
+  ],
+  ingredients: [
+    (value) => {
+      if (value?.length > 2) return true
+      return "Come on, tell me your secrets, less than 3 doesn't count"
+    },
+  ],
+}
 </script>
 
 <style>
