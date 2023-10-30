@@ -59,7 +59,7 @@
         </template>
       </v-combobox>
       <v-list v-if="ingredients.length" class="ingredientsList">
-        <v-list-item v-for="(ingr, index) in ingredients" :key="ingr">
+        <v-list-item v-for="(ingr, index) in ingredients" :key="ingr.title">
           <v-row>
             <v-col cols="xs-12 sm-4">
               <v-list-subheader>{{ ingr.title }}</v-list-subheader>
@@ -85,7 +85,7 @@
         </v-list-item>
       </v-list>
       <v-combobox
-        v-model="currentDish.filters.value"
+        v-model="currentDish.filters"
         v-model:search="searchfilter"
         :hide-no-data="false"
         :items="quickFilters"
@@ -173,6 +173,7 @@ const quickFilters = ref([
   'breakfast',
   'dinner',
   'soup',
+  'side dish',
 ])
 
 const ingredients = ref([])
@@ -213,7 +214,6 @@ const photoInput = async () => {
 
 // When an ingredient is added, its value is changed to an object containing the amount and unit name properties.
 watch(ingredients, (value, oldValue) => {
-  console.log(value, oldValue)
   if (value.length < oldValue.length) return
   const lastItem = value[value.length - 1]
   if (
@@ -227,12 +227,6 @@ watch(ingredients, (value, oldValue) => {
       unitName: '',
     })
   }
-  console.log(
-    22222,
-    'cahnged ingredients: ',
-    typeof lastItem,
-    ingredients.value
-  )
 })
 
 // Form validation

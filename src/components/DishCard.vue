@@ -11,15 +11,19 @@
     >
       <v-btn
         class="favorite"
-        :icon="favorite ? 'mdi-heart' : 'mdi-heart-outline'"
-        @click="() => (favorite = !favorite)"
+        :icon="props.details.isFavorite ? 'mdi-heart' : 'mdi-heart-outline'"
+        @click="
+          () =>
+            updateDishField(props.details.id, {
+              isFavorite: !props.details.isFavorite,
+            })
+        "
       ></v-btn>
       <v-card-title>{{ props.details.name }}</v-card-title>
     </v-img>
 
     <v-card-text class="py-0">
-      <!-- {{ props.details.ingredients?.map(({ name }) => name).join(' ') }} -->
-      {{ props.details.ingredients?.join(' ') }}
+      {{ props.details.ingredients?.map(({ title }) => title).join(', ') }}
     </v-card-text>
 
     <div class="d-flex py-3 justify-space-between">
@@ -58,7 +62,9 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-const favorite = ref(false)
+import { useDishStore } from '@/store'
+const { updateDishField } = useDishStore()
+
 const props = defineProps(['details'])
 const show = ref(false)
 </script>

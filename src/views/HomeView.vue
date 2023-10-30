@@ -11,7 +11,7 @@
           :loading="loading"
           density="compact"
           variant="solo"
-          label="Search templates"
+          label="Search"
           append-inner-icon="mdi-magnify"
           v-model="searchText"
           single-line
@@ -31,7 +31,7 @@
         </v-list>
       </ais-instant-search>
     </v-row>
-    <v-row align="center" justify="space-between">
+    <v-row align="center" justify="space-between" variant="solo">
       <v-col cols="auto">
         <span class="subheading">Quick filters</span>
         <v-chip-group

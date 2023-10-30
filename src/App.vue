@@ -1,6 +1,6 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar color="surface-variant" height="96">
+    <v-app-bar height="96">
       <v-container>
         <v-row align="center">
           <v-col>

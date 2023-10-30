@@ -69,6 +69,7 @@ export const useDishStore = defineStore('dish', {
       portion: null,
       photo: null,
       user: null,
+      isFavorite: null,
     },
   }),
   getters: {
@@ -77,7 +78,6 @@ export const useDishStore = defineStore('dish', {
   actions: {
     async setup() {
       this.getDishes()
-
       // TODO find a better way to fetch all the ingredients
       const { hits } = await index.search('')
       const ingrs = hits.reduce(
@@ -87,7 +87,6 @@ export const useDishStore = defineStore('dish', {
       this.allIngredients = ingrs
         .map(({ title }) => title)
         .filter((item) => item)
-      console.log(11111111, this.allIngredients)
     },
     getDishes(filters = {}) {
       onSnapshot(
@@ -145,6 +144,14 @@ export const useDishStore = defineStore('dish', {
         snackbar.setMessage(error.message, 'error')
       }
     },
+    async updateDishField(id, data) {
+      try {
+        await setDoc(doc(db, 'dishes', id), data, { merge: true })
+      } catch (error) {
+        const snackbar = useSnackBar()
+        snackbar.setMessage(error.message, 'error')
+      }
+    },
     async uploadPhoto(photoToUpload) {
       if (!photoToUpload) return null
       const storageRef = firebaseRef(storage, `${photoToUpload.name}`)
@@ -173,10 +180,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async setup() {
-      const unsubscribe = auth.onAuthStateChanged(
-        (firebaseUser) => (this.user = firebaseUser)
-      )
-      return unsubscribe
+      auth.onAuthStateChanged((firebaseUser) => (this.user = firebaseUser))
     },
     async login(email, password) {
       return await signInWithEmailAndPassword(auth, email, password)
