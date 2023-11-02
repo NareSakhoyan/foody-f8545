@@ -4,7 +4,7 @@
       <v-container>
         <v-row align="center">
           <v-col>
-            <h3 v-if="user">{{ `Heeey ${user?.displayName}!` }}</h3>
+            <h3 v-if="currentUser">{{ `Heeey ${currentUser?.displayName}!` }}</h3>
             <v-switch
               v-model="themeToggle"
               hide-details
@@ -27,28 +27,20 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, } from 'vue'
 import { useTheme } from 'vuetify'
+import { RouterView } from 'vue-router'
 import Login from '@components/LogIn.vue'
 import SnackBar from '@components/SnackBar.vue'
+import { useAuthStore } from '@/store'
+import { storeToRefs } from 'pinia'
 
 const theme = useTheme()
 const themeToggle = ref(false)
-const auth = getAuth()
-const user = ref()
 
-import { getAuth } from 'firebase/auth'
-import { RouterView } from 'vue-router'
-const handleAuthStateChanged = (firebaseUser) => {
-  user.value = firebaseUser
-}
+const { currentUser } = storeToRefs(useAuthStore())
 
-// Watch for changes in authentication state
-onMounted(() => {
-  const unsubscribe = auth.onAuthStateChanged(handleAuthStateChanged)
-  // To unsubscribe from the watcher when the component unmounts
-  onBeforeUnmount(unsubscribe)
-})
+
 watch(
   themeToggle,
   (value) => (theme.global.name.value = value ? 'light' : 'dark')

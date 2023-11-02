@@ -2,49 +2,53 @@
   <div class="text-center">
     <v-menu v-model="menu" :close-on-content-click="false" location="start">
       <template v-slot:activator="{ props }">
-        <v-btn class="ma-2" v-bind="props" disabled>
+        <v-btn class="ma-2" v-bind="props">
           <v-icon start icon="mdi-filter"></v-icon>
           Filters
         </v-btn>
       </template>
-
       <v-card min-width="300">
-        <v-list>
-          <v-list-item
-            prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-            title="John Leider"
-            subtitle="Founder of Vuetify"
-          >
-            <template v-slot:append>
-              <v-btn
-                variant="text"
-                :class="fav ? 'text-red' : ''"
-                icon="mdi-heart"
-                @click="fav = !fav"
-              ></v-btn>
-            </template>
-          </v-list-item>
-        </v-list>
-
         <v-divider></v-divider>
 
-        <v-list>
-          <v-list-item>
-            <v-switch
-              v-model="message"
-              color="purple"
-              label="Enable messages"
-              hide-details
-            ></v-switch>
+        <v-list class="filters-list">
+          <v-list-item title="Ingredients">
+            <v-combobox
+              v-model="ingredients"
+              v-model:search="searchIngredient"
+              :hide-no-data="false"
+              :items="allIngredients"
+              hide-selected
+              label="Ingredients"
+              multiple
+              small-chips
+              item-text="title"
+              item-value="title"
+            />
           </v-list-item>
-
-          <v-list-item>
-            <v-switch
-              v-model="hints"
-              color="purple"
-              label="Enable hints"
-              hide-details
-            ></v-switch>
+          <v-list-item class="list-item-overflow-visible" title="Cost">
+            <v-range-slider
+              v-model="cost"
+              step="500"
+              max="15000"
+              thumb-label="always"
+              class="slider"
+            ></v-range-slider>
+          </v-list-item>
+          <v-list-item class="list-item-overflow-visible" title="Time">
+            <v-slider
+              v-model="time"
+              :color="color"
+              track-color="grey"
+              max="120"
+              step="5"
+              show-ticks
+              tick-size="2"
+              thumb-label="always"
+            >
+              <template v-slot:thumb-label="{ modelValue }">
+                {{ modelValue }} mnts
+              </template>
+            </v-slider>
           </v-list-item>
         </v-list>
 
@@ -52,8 +56,8 @@
           <v-spacer></v-spacer>
 
           <v-btn variant="text" @click="menu = false"> Cancel </v-btn>
-          <v-btn color="primary" variant="text" @click="menu = false">
-            Save
+          <v-btn color="secondary" variant="text" @click="menu = false">
+            Load
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -61,10 +65,42 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDishStore } from '@/store'
 
-const fav = ref(true)
+const store = useDishStore()
+const { allIngredients } = storeToRefs(store)
+
+const ingredients = ref([])
 const menu = ref(false)
-const message = ref(false)
-const hints = ref(true)
+const cost = ref([1000, 7500])
+const time = ref(10)
+
+const color = computed(() => {
+  if (time.value <= 15) return 'green'
+  if (time.value <= 30) return 'teal'
+  if (time.value <= 45) return 'blue'
+  if (time.value <= 60) return 'lime'
+  if (time.value <= 100) return 'orange'
+  return 'red'
+})
 </script>
+
+<style>
+.list-item-overflow-visible .v-list-item__content {
+  overflow: visible;
+  .v-slider__container {
+    margin-top: 1.25rem;
+  }
+  .v-slider-thumb__label {
+    white-space: nowrap;
+  }
+}
+.filters-list {
+  overflow: hidden;
+}
+.filters-list .v-list-item-title {
+  margin-bottom: 1rem;
+}
+</style>
