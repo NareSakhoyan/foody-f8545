@@ -22,6 +22,13 @@ const pinia = createPinia()
 const vuetify = createVuetify({
   theme: {
     defaultTheme: 'dark',
+    themes: {
+      dark: {
+        colors: {
+          primary: '#009688',
+        },
+      },
+    },
   },
   components,
   directives,
