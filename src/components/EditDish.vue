@@ -112,6 +112,7 @@
         label="How much does it cost?"
         v-model="currentDish.cost"
         prefix="֏"
+        :rules="rules.cost"
       />
       <v-textarea label="Notes?" v-model="currentDish.process"></v-textarea>
       <v-row>
@@ -198,6 +199,7 @@ const saveDish = async () => {
   currentDish.value.user = user.value.uid
   currentDish.value.photo = downloadURL.value
   currentDish.value.ingredients = ingredients
+  currentDish.value.cost = parseInt(currentDish.value.cost) || 0
   if (editPageId) {
     await updateDish(editPageId, deepUnref(currentDish))
   } else {
@@ -248,6 +250,12 @@ const rules = {
     (value) => {
       if (value?.length > 2) return true
       return "Come on, tell me your secrets, less than 3 doesn't count"
+    },
+  ],
+  cost: [
+    (value) => {
+      if (value && /^[0-9]+$/.test(value)) return true
+      return 'Just need the numbers'
     },
   ],
 }

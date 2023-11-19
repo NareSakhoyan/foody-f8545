@@ -4,7 +4,9 @@
       <v-container>
         <v-row align="center">
           <v-col>
-            <h3 v-if="currentUser">{{ `Heeey ${currentUser?.displayName}!` }}</h3>
+            <h3 v-if="currentUser">
+              {{ `Heeey ${currentUser?.displayName || ''}!` }}
+            </h3>
             <v-switch
               v-model="themeToggle"
               hide-details
@@ -27,7 +29,7 @@
 </template>
 
 <script setup>
-import { ref, watch, } from 'vue'
+import { ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { RouterView } from 'vue-router'
 import Login from '@components/LogIn.vue'
@@ -39,7 +41,6 @@ const theme = useTheme()
 const themeToggle = ref(false)
 
 const { currentUser } = storeToRefs(useAuthStore())
-
 
 watch(
   themeToggle,

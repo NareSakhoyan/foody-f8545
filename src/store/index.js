@@ -89,16 +89,40 @@ export const useDishStore = defineStore('dish', {
         .filter((item) => item)
     },
     getDishes(filters = {}) {
+      const { quickFilters, ingredients = [], time, cost } = filters
+
+      let baseQuery = query(collection(db, 'dishes'))
+
+      if (quickFilters?.length) {
+        baseQuery = query(
+          baseQuery,
+          where('filters', 'array-contains-any', quickFilters)
+        )
+      }
+
+      if (cost?.length) {
+        baseQuery = query(
+          baseQuery,
+          where('cost', '>=', cost[0]),
+          where('cost', '<=', cost[1])
+        )
+      }
+
       onSnapshot(
-        query(
-          collection(db, 'dishes'),
-          filters?.quickFilters?.length &&
-            where('filters', 'array-contains-any', filters.quickFilters)
-        ),
+        query(baseQuery),
         (querySnapshot) => {
           const arr = []
           querySnapshot.forEach((item) => {
-            arr.push({ id: item.id, ...item.data() })
+            const details = item.data()
+            if (time && details?.time > time) return
+            if (
+              ingredients?.length &&
+              !details.ingredients
+                ?.map(({ title }) => title)
+                .some((ingr) => ingredients.includes(ingr))
+            )
+              return
+            arr.push({ id: item.id, ...details })
           })
           this.dishes = arr
         },
