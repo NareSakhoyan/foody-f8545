@@ -1,4 +1,5 @@
-import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import { defineStore, storeToRefs } from 'pinia'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -15,15 +16,19 @@ import {
   getDoc,
   addDoc,
   setDoc,
+  getDocs,
+  and,
+  limit,
 } from 'firebase/firestore'
-import { db } from '@/firebase.js'
-import { auth } from '@/firebase.js'
 import {
   getStorage,
   ref as firebaseRef,
   uploadBytes,
   getDownloadURL,
 } from 'firebase/storage'
+import { db } from '@src/firebase.js'
+import { auth } from '@src/firebase.js'
+import { index } from '@src/query'
 
 const storage = getStorage()
 
@@ -32,6 +37,7 @@ export const useSnackBar = defineStore('snackbar', {
     text: '',
     type: '',
     status: false,
+    loading: false,
   }),
   actions: {
     setMessage(text, type) {
@@ -49,8 +55,6 @@ const setSnackBarMessage = (msg) => {
   const snackBarStore = useSnackBar()
   snackBarStore.setMessage(msg, 'error')
 }
-
-import { index } from '@/query'
 
 export const useDishStore = defineStore('dish', {
   state: () => ({
@@ -140,40 +144,36 @@ export const useDishStore = defineStore('dish', {
         data.id ??= id
         this.currentDish = data
       } catch (error) {
-        const snackbar = useSnackBar()
-        snackbar.setMessage(error.message, 'error')
+        setSnackBarMessage(error.message, 'error')
       }
     },
     async addDish(data) {
+      delete data.id
       try {
         await addDoc(collection(db, 'dishes'), data)
       } catch (error) {
-        const snackbar = useSnackBar()
-        snackbar.setMessage(error.message, 'error')
+        setSnackBarMessage(error.message, 'error')
       }
     },
     async deleteDish(id) {
       try {
         await deleteDoc(doc(db, 'dishes', id))
       } catch (error) {
-        const snackbar = useSnackBar()
-        snackbar.setMessage(error.message, 'error')
+        setSnackBarMessage(error.message, 'error')
       }
     },
     async updateDish(id, data) {
       try {
         await setDoc(doc(db, 'dishes', id), data)
       } catch (error) {
-        const snackbar = useSnackBar()
-        snackbar.setMessage(error.message, 'error')
+        setSnackBarMessage(error.message, 'error')
       }
     },
     async updateDishField(id, data) {
       try {
         await setDoc(doc(db, 'dishes', id), data, { merge: true })
       } catch (error) {
-        const snackbar = useSnackBar()
-        snackbar.setMessage(error.message, 'error')
+        setSnackBarMessage(error.message, 'error')
       }
     },
     async uploadPhoto(photoToUpload) {
@@ -184,39 +184,124 @@ export const useDishStore = defineStore('dish', {
         const downloadURL = await getDownloadURL(storageRef)
         return downloadURL
       } catch (error) {
-        const snackbar = useSnackBar()
-        snackbar.setMessage(error.message, 'error')
+        setSnackBarMessage(error.message, 'error')
       }
-    },
-    filter() {
-      // todo handle filters
-      return this.dishes.map((item) => item)
     },
   },
 })
 
-export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    user: null,
-  }),
-  getters: {
-    currentUser: (state) => state.user,
-  },
-  actions: {
-    async setup() {
-      auth.onAuthStateChanged((firebaseUser) => (this.user = firebaseUser))
-    },
-    async login(email, password) {
-      return await signInWithEmailAndPassword(auth, email, password)
-    },
-    async signUp(name, email, password) {
-      await createUserWithEmailAndPassword(auth, email, password)
-      await updateProfile(auth.currentUser, {
-        displayName: name,
+export const useAuthStore = defineStore('auth', () => {
+  const snackBarStore = useSnackBar()
+  const user = ref(null)
+  const currentUser = computed(() => user)
+  const setup = async () => {
+    const result = await auth.onAuthStateChanged((firebaseUser) => {
+      user.value = firebaseUser
+      if (firebaseUser) snackBarStore.loading = !snackBarStore.loading
+    })
+    return result
+  }
+  const login = async (email, password) => {
+    return await signInWithEmailAndPassword(auth, email, password)
+  }
+  const signUp = async (name, email, password) => {
+    await createUserWithEmailAndPassword(auth, email, password)
+    await updateProfile(auth.currentUser, {
+      displayName: name,
+    })
+  }
+  const logOut = async () => {
+    await signOut(auth)
+  }
+  return {
+    setup,
+    login,
+    signUp,
+    logOut,
+    user,
+    currentUser,
+  }
+})
+
+export const useCalendarStore = defineStore('calendar', () => {
+  const authStore = useAuthStore()
+  const currentWeek = ref([])
+  const currentWeekStart = ref(null)
+  const calendar = ref([])
+  const { user } = storeToRefs(authStore)
+
+  const setup = async () => {
+    try {
+      // find the first day of this week
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const currentDay = today.getDay()
+      const startDate = new Date(today)
+      startDate.setDate(today.getDate() - currentDay + 1)
+
+      currentWeekStart.value = startDate
+
+      const q = query(
+        collection(db, 'calendar'),
+        and(
+          where('key', '==', (startDate / 1000) | 0),
+          where('user', '==', user.value.uid)
+        )
+      )
+      const querySnapshot = await getDocs(q, limit(1))
+      querySnapshot.forEach((doc) => {
+        currentWeek.value = { id: doc.id, ...doc.data() }
       })
-    },
-    async logOut() {
-      await signOut(auth)
-    },
-  },
+      if (!currentWeek?.value) {
+        const generateCurrentWeek = () => {
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          const currentDay = today.getDay()
+          const startDate = new Date(today)
+          startDate.setDate(today.getDate() - currentDay + 1) // Start from Monday
+
+          const weekDates = []
+
+          for (let i = 0; i < 7; i++) {
+            const currentDate = new Date(startDate)
+            currentDate.setDate(startDate.getDate() + i)
+            weekDates.push(currentDate)
+          }
+          return weekDates
+        }
+
+        currentWeek.value = generateCurrentWeek()
+      }
+    } catch (error) {
+      const snackbar = useSnackBar()
+      snackbar.setMessage(error.message, 'error')
+    }
+  }
+  const addWeek = async (cards) => {
+    if (currentWeek?.value?.id) {
+      try {
+        await setDoc(
+          doc(db, 'calendar', currentWeek.value.id),
+          { cards },
+          {
+            merge: true,
+          }
+        )
+      } catch (error) {
+        setSnackBarMessage(error.message, 'error')
+      }
+    } else {
+      try {
+        await addDoc(collection(db, 'calendar'), {
+          key: (currentWeekStart.value / 1000) | 0,
+          cards,
+          user: user.value.uid,
+        })
+      } catch (error) {
+        setSnackBarMessage(error.message, 'error')
+      }
+    }
+  }
+
+  return { currentWeek, calendar, setup, addWeek }
 })

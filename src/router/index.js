@@ -7,7 +7,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'Home',
-      component: HomeView,
+      // component: HomeView,
+      component: () => import('@views/HomeView.vue'),
+    },
+    {
+      path: '/dishes',
+      name: 'Dishes',
+      redirect: { name: 'Home' },
     },
     {
       path: '/dish/:dish?',
@@ -20,9 +26,14 @@ const router = createRouter({
       component: () => import('@components/EditDish.vue'),
     },
     {
-      path: '/about',
-      name: 'About',
-      component: () => import('@views/AboutView.vue'),
+      path: '/calendar',
+      name: 'Calendar',
+      component: () => import('@views/Calendar.vue'),
+    },
+    {
+      path: '/inventory',
+      name: 'Inventory',
+      component: () => import('@views/Inventory.vue'),
     },
   ],
 })

@@ -150,7 +150,7 @@
 
 import { ref, onMounted, watch } from 'vue'
 import { deepUnref } from 'vue-deepunref'
-import { useDishStore, useAuthStore } from '@/store'
+import { useDishStore, useAuthStore } from '@store'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -165,7 +165,17 @@ const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
 
 // Load ingredients from a data store.
-const unitNames = ref(['gr', 'kg', 'piece', 'box', 'l', 'ml', 'tbsp', 'tsp'])
+const unitNames = ref([
+  'gr',
+  'kg',
+  'piece',
+  'box',
+  'l',
+  'ml',
+  'tbsp',
+  'tsp',
+  'spice',
+])
 const quickFilters = ref([
   'spicy',
   'chicken',

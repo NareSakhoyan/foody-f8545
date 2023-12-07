@@ -82,7 +82,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useAuthStore } from '@/store'
+import { useAuthStore } from '@store'
 import { storeToRefs } from 'pinia'
 
 const store = useAuthStore()
@@ -121,8 +121,8 @@ const logOut = async () => {
   }
 }
 
-onMounted(() => {
-  const unsubscribe = store.setup()
+onMounted(async () => {
+  const unsubscribe = await store.setup()
   onBeforeUnmount(unsubscribe)
 })
 </script>

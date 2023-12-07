@@ -79,7 +79,7 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { deepUnref } from 'vue-deepunref'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store'
 
 const store = useDishStore()
 const { getDishes } = store

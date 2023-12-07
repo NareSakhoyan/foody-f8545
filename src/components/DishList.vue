@@ -22,7 +22,7 @@
 <script setup>
 import DishCard from './DishCard.vue'
 import { onMounted } from 'vue'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store'
 import { storeToRefs } from 'pinia'
 const store = useDishStore()
 const { dishes } = storeToRefs(store)

@@ -55,11 +55,11 @@ import { ref, watch } from 'vue'
 import { deepUnref } from 'vue-deepunref'
 import Filters from '@components/FilterOptions.vue'
 import DishList from '@components/DishList.vue'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store'
 import { history } from 'instantsearch.js/es/lib/routers'
 import { singleIndex } from 'instantsearch.js/es/lib/stateMappings'
-import router from '@/router'
-import { searchClient, index } from '@/query'
+import router from '@src/router'
+import { searchClient, index } from '@src/query'
 
 const routing = {
   router: history(),
@@ -98,7 +98,6 @@ watch(selection, async (selection) => {
   const quickFilters = deepUnref(selection).map((item) => tags.value[item])
   getDishes({ quickFilters })
 })
-
 const search = () => {
   searchClient.$ais.currentRefinement = searchText
 }

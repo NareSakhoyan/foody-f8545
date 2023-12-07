@@ -19,10 +19,10 @@
             })
         "
       ></v-btn>
-      <v-card-title>{{ props.details.name }}</v-card-title>
+      <v-card-title class="title">{{ props.details.name }}</v-card-title>
     </v-img>
 
-    <v-card-text class="py-0">
+    <v-card-text class="pt-2 pb-0">
       {{ props.details.ingredients?.map(({ title }) => title).join(', ') }}
     </v-card-text>
 
@@ -62,7 +62,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store'
 const { updateDishField } = useDishStore()
 
 const props = defineProps(['details'])
@@ -75,5 +75,8 @@ const show = ref(false)
   right: 0;
   margin: 0.5rem;
   z-index: 1;
+}
+.title {
+  background-color: #0006;
 }
 </style>

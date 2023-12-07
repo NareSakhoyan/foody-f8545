@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup>
-import { useSnackBar } from '@/store'
+import { useSnackBar } from '@store'
 import { storeToRefs } from 'pinia'
 const store = useSnackBar()
 const { text, type, status } = storeToRefs(store)
