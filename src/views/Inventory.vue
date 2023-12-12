@@ -27,14 +27,5 @@
 
 <script setup>
 import { ref } from 'vue'
-const tasks = ref([
-  {
-    done: false,
-    text: 'Foobar',
-  },
-  {
-    done: false,
-    text: 'Fizzbuzz',
-  },
-])
+const tasks = ref([])
 </script>
