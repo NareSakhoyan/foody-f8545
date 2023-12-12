@@ -53,7 +53,7 @@
       <v-btn size="small" :to="`/dish/${props.details.id}`"> More </v-btn>
       <v-spacer></v-spacer>
       <v-btn
-        v-if="props.details.proces"
+        v-if="props.details.process"
         :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
         @click="show = !show"
       ></v-btn>

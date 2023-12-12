@@ -1,9 +1,6 @@
 <template>
   <v-container fluid>
     <!-- board column -->
-    {{ cards }}
-    <hr />
-    {{ currentWeek.cards }}
     <v-row style="min-width: 800px" class="horizontally-scrollable">
       <v-col
         cols="3"

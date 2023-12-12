@@ -66,7 +66,9 @@
             }}
           </v-chip>
         </v-chip-group>
-        <v-list-item-subtitle> {{ currentDish.process }} </v-list-item-subtitle>
+        <v-list-item-subtitle class="keep-line-break">
+          {{ currentDish.process }}
+        </v-list-item-subtitle>
         <v-card-actions>
           <v-btn
             prepend-icon="mdi-pencil-outline"
@@ -113,3 +115,9 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.keep-line-break {
+  white-space: pre-wrap;
+}
+</style>
