@@ -1,9 +1,9 @@
 <template>
-  <v-card @click="$emit('edit')" class="pa-5 mt-4 card-shadow">
+  <v-card class="pa-5 mt-4 card-shadow" @click="$emit('edit')">
     <div class="d-flex align-start font-weight-bold text-title">
       <span class="flex-fill">{{ card.name }}</span>
       <v-menu location="bottom end" transition="slide-x-transition">
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props }">
           <v-btn
             v-bind="props"
             size="small"
@@ -20,8 +20,8 @@
               <Icon
                 icon="flat-color-icons:edit-image"
                 :rotate="2"
-                :horizontalFlip="true"
-                :verticalFlip="true"
+                :horizontal-flip="true"
+                :vertical-flip="true"
                 class="mr-1"
               />
               <span> Edit</span>
@@ -32,8 +32,8 @@
               <Icon
                 icon="flat-color-icons:full-trash"
                 :rotate="2"
-                :horizontalFlip="true"
-                :verticalFlip="true"
+                :horizontal-flip="true"
+                :vertical-flip="true"
                 :inline="true"
                 class="mr-1"
               />
@@ -44,16 +44,13 @@
       </v-menu>
     </div>
     <div class="text-content">
-      <v-card
-        min-height="100"
-        class="mx-auto mt-4 align-end text-white"
-        :image="props.card.photo"
-      >
+      <v-card min-height="100" class="mx-auto mt-4 align-end text-white" :image="props.card.photo">
       </v-card>
     </div>
   </v-card>
 </template>
-<script setup lang="ts">
+
+<script setup>
 import { Icon } from '@iconify/vue'
 
 const props = defineProps({

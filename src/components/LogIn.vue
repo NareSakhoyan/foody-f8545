@@ -1,15 +1,10 @@
 <template>
   <v-btn v-if="user" append-icon="mdi-logout" @click="logOut"> Log out </v-btn>
   <v-dialog v-else v-model="loginOverlay" width="1024">
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn append-icon="mdi-account-circle" v-bind="props"> Log in </v-btn>
     </template>
-    <v-card
-      class="mx-auto pa-12 pb-8 mb-12"
-      elevation="8"
-      width="448"
-      rounded="lg"
-    >
+    <v-card class="mx-auto pa-12 pb-8 mb-12" elevation="8" width="448" rounded="lg">
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
       <v-text-field
@@ -29,9 +24,7 @@
         required
       ></v-text-field>
 
-      <div
-        class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
-      >
+      <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
         Password
 
         <a
@@ -66,12 +59,12 @@
       </v-btn>
 
       <v-btn
+        v-if="!signup"
         block
         class="mb-8"
         color="blue"
         size="large"
         variant="tonal"
-        v-if="!signup"
         @click="() => (signup = true)"
       >
         Sign up now

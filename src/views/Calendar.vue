@@ -3,9 +3,9 @@
     <!-- board column -->
     <v-row style="min-width: 800px" class="horizontally-scrollable">
       <v-col
-        cols="3"
         v-for="(column, colIndex) in columns"
         :key="column.key"
+        cols="3"
         class="pa-4 flex-fill"
       >
         <div class="d-flex align-center">
@@ -33,10 +33,10 @@
             label="Select"
             autofocus
             variant="underlined"
-            @keyup.enter="addCard(column)"
-            @keyup.esc="column.isAddVisible = false"
             :items="dishes"
             item-title="name"
+            @keyup.enter="addCard(column)"
+            @keyup.esc="column.isAddVisible = false"
           >
           </v-select>
 
@@ -47,11 +47,7 @@
               @click="column.isAddVisible = !column.isAddVisible"
               >Cancel</v-btn
             >
-            <v-btn
-              class="flex-fill ma-1"
-              size="small"
-              color="primary"
-              @click="addCard(column)"
+            <v-btn class="flex-fill ma-1" size="small" color="primary" @click="addCard(column)"
               >Add</v-btn
             >
           </div>
@@ -67,8 +63,8 @@
             ghostClass: 'ghost',
           }"
           class="list-group"
+          item-key="id"
           @change="column.callback"
-          itemKey="id"
         >
           <template #item="{ element, index }">
             <calendar-card
@@ -85,12 +81,10 @@
   </v-container>
 
   <!-- edit card dialog -->
-  <v-dialog persistent v-model="editDialog" width="600">
+  <v-dialog v-model="editDialog" persistent width="600">
     <v-card>
       <v-card-title class="pa-4 d-flex align-center">
-        <span class="flex-fill"
-          >Customize | work in progress, don't do anything here</span
-        >
+        <span class="flex-fill">Customize | work in progress, don't do anything here</span>
         <v-btn
           variant="text"
           rounded
@@ -105,12 +99,12 @@
       <v-divider></v-divider>
       <div class="pa-4">
         <v-text-field
+          v-model="title"
           class="py-2 px-1"
           color="primary"
-          v-model="title"
           label="Title"
           variant="plain"
-          hideDetails
+          hide-details
           placeholder="Title"
           autofocus
           @keyup.enter="saveCard"
@@ -140,9 +134,7 @@
       <v-card-text>DeleteDescription</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn variant="plain" color="primary" @click="deleteDialog = false"
-          >Cancel</v-btn
-        >
+        <v-btn variant="plain" color="primary" @click="deleteDialog = false">Cancel</v-btn>
         <v-btn variant="flat" color="error" @click="deleteCard()">Delete</v-btn>
       </v-card-actions>
     </v-card>
@@ -173,15 +165,7 @@ const { loading } = storeToRefs(snackBarStore)
 const { dishes } = storeToRefs(dishStore)
 const { currentWeek } = storeToRefs(calendarStore)
 
-const days = ref([
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-])
+const days = ref(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
 const columns = reactive([])
 
 watch(
@@ -190,7 +174,7 @@ watch(
     await calendarStore.setup()
     parseCards(currentWeek.value.cards)
   },
-  { deep: true }
+  { deep: true },
 )
 
 const initColumns = () => {
@@ -218,7 +202,7 @@ const addCard = (column) => {
   const { addTitle, key } = column
   const dish = dishes.value.find(({ name }) => name == addTitle)
   if (!addTitle) return
-  let newCard = {
+  const newCard = {
     id: dish.id,
     day: key,
     name: addTitle,
@@ -254,9 +238,7 @@ const showEdit = (card) => {
 }
 
 const saveCard = () => {
-  let targetCard = currentWeek.value.cards.value.find(
-    (card) => card.id === cardToEdit.value.id
-  )
+  const targetCard = currentWeek.value.cards.value.find((card) => card.id === cardToEdit.value.id)
   if (targetCard) {
     targetCard.title = title.value
     targetCard.description = description.value
@@ -277,7 +259,7 @@ const showDelete = (card, columnIndex) => {
 const deleteCard = () => {
   deleteDialog.value = false
   const cardIndex = columns[colIndexFromDelete.value].cards.findIndex(
-    (card) => card.id === cardToDelete.value.id
+    (card) => card.id === cardToDelete.value.id,
   )
 
   if (cardIndex !== -1) {
@@ -290,13 +272,13 @@ watch(
   async (newColumns) => {
     const columnsCardData = newColumns.reduce(
       (acc, { cards = [] }) => [...toRaw(cards), ...acc],
-      []
+      [],
     )
     if (newColumns.length && columnsCardData.length) {
       await addWeek(columnsCardData)
     }
   },
-  { deep: true }
+  { deep: true },
 )
 </script>
 

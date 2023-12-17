@@ -1,45 +1,33 @@
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar height="96" v-if="windowWidth < 1024">
+    <v-app-bar v-if="windowWidth < 1024" height="96">
       <v-container>
         <v-row align="center">
           <v-col>
             <h3 v-if="currentUser">
               {{ `Heeey ${currentUser?.displayName || ''}!` }}
             </h3>
-            <v-switch
-              v-model="themeToggle"
-              hide-details
-              inset
-              label="Theme"
-            ></v-switch>
+            <v-switch v-model="themeToggle" hide-details inset label="Theme"></v-switch>
           </v-col>
           <Login />
         </v-row>
       </v-container>
     </v-app-bar>
 
-    <!-- <SideBar v-if="windowWidth >= 1024" /> -->
     <v-navigation-drawer
+      v-if="windowWidth >= 1024"
       v-model="drawer"
       :rail="rail"
       permanent
       @click="rail = false"
-      v-if="windowWidth >= 1024"
     >
       <v-list-item
-        :prepend-avatar="`https://placehold.co/40x40?text=${
-          currentUser?.displayName || 'U'
-        }`"
+        :prepend-avatar="`https://placehold.co/40x40?text=${currentUser?.displayName || 'U'}`"
         :title="`Heeey ${currentUser?.displayName || ''}!`"
         nav
       >
-        <template v-slot:append>
-          <v-btn
-            variant="text"
-            icon="mdi-chevron-left"
-            @click.stop="rail = !rail"
-          ></v-btn>
+        <template #append>
+          <v-btn variant="text" icon="mdi-chevron-left" @click.stop="rail = !rail"></v-btn>
         </template>
       </v-list-item>
 
@@ -57,9 +45,6 @@
       </v-list>
     </v-navigation-drawer>
     <v-main class="flex align-center justify-center">
-      <!-- <KeepAlive>
-        <RouterView />
-      </KeepAlive> -->
       <router-view v-slot="{ Component }">
         <keep-alive include="Calendar,HomeView">
           <component :is="Component" />
@@ -69,12 +54,7 @@
     </v-main>
 
     <v-bottom-navigation v-if="windowWidth < 1024">
-      <v-btn
-        v-for="m in menu"
-        :key="m.id"
-        :value="m.id"
-        @click="router.push('/' + m.id)"
-      >
+      <v-btn v-for="m in menu" :key="m.id" :value="m.id" @click="router.push('/' + m.id)">
         <v-icon>{{ m.icon }}</v-icon>
 
         <span>{{ m.name }}</span>
@@ -91,9 +71,9 @@ import { RouterView, useRouter } from 'vue-router'
 import Login from '@components/LogIn.vue'
 import SnackBar from '@components/SnackBar.vue'
 // import SideBar from '@components/SideBar.vue'
-import { useAuthStore } from '@store'
+import { useAuthStore, useDishStore } from '@store'
 import { storeToRefs } from 'pinia'
-import { useDishStore } from '@store'
+
 const router = useRouter()
 
 const theme = useTheme()
@@ -112,10 +92,7 @@ const { currentUser } = storeToRefs(useAuthStore())
 const dishStore = useDishStore()
 const authStore = useAuthStore()
 
-watch(
-  themeToggle,
-  (value) => (theme.global.name.value = value ? 'light' : 'dark')
-)
+watch(themeToggle, (value) => (theme.global.name.value = value ? 'light' : 'dark'))
 // TODO: change this to use Vuetify v-resize
 const onResize = () => {
   windowWidth.value = window.innerWidth

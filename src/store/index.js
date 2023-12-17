@@ -20,14 +20,8 @@ import {
   and,
   limit,
 } from 'firebase/firestore'
-import {
-  getStorage,
-  ref as firebaseRef,
-  uploadBytes,
-  getDownloadURL,
-} from 'firebase/storage'
-import { db } from '@src/firebase.js'
-import { auth } from '@src/firebase.js'
+import { getStorage, ref as firebaseRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { db, auth } from '@src/firebase.js'
 import { index } from '@src/query'
 
 const storage = getStorage()
@@ -84,13 +78,8 @@ export const useDishStore = defineStore('dish', {
       this.getDishes()
       // TODO find a better way to fetch all the ingredients
       const { hits } = await index.search('')
-      const ingrs = hits.reduce(
-        (acc, { ingredients }) => [...acc, ...ingredients],
-        []
-      )
-      this.allIngredients = ingrs
-        .map(({ title }) => title)
-        .filter((item) => item)
+      const ingrs = hits.reduce((acc, { ingredients }) => [...acc, ...ingredients], [])
+      this.allIngredients = ingrs.map(({ title }) => title).filter((item) => item)
     },
     getDishes(filters = {}) {
       const { quickFilters, ingredients = [], time, cost } = filters
@@ -98,18 +87,11 @@ export const useDishStore = defineStore('dish', {
       let baseQuery = query(collection(db, 'dishes'))
 
       if (quickFilters?.length) {
-        baseQuery = query(
-          baseQuery,
-          where('filters', 'array-contains-any', quickFilters)
-        )
+        baseQuery = query(baseQuery, where('filters', 'array-contains-any', quickFilters))
       }
 
       if (cost?.length) {
-        baseQuery = query(
-          baseQuery,
-          where('cost', '>=', cost[0]),
-          where('cost', '<=', cost[1])
-        )
+        baseQuery = query(baseQuery, where('cost', '>=', cost[0]), where('cost', '<=', cost[1]))
       }
 
       onSnapshot(
@@ -132,7 +114,7 @@ export const useDishStore = defineStore('dish', {
         },
         (error) => {
           setSnackBarMessage(error.message, 'error')
-        }
+        },
       )
     },
     async getDish(id) {
@@ -201,9 +183,7 @@ export const useAuthStore = defineStore('auth', () => {
     })
     return result
   }
-  const login = async (email, password) => {
-    return await signInWithEmailAndPassword(auth, email, password)
-  }
+  const login = async (email, password) => await signInWithEmailAndPassword(auth, email, password)
   const signUp = async (name, email, password) => {
     await createUserWithEmailAndPassword(auth, email, password)
     await updateProfile(auth.currentUser, {
@@ -243,10 +223,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
       const q = query(
         collection(db, 'calendar'),
-        and(
-          where('key', '==', (startDate / 1000) | 0),
-          where('user', '==', user.value.uid)
-        )
+        and(where('key', '==', (startDate / 1000) | 0), where('user', '==', user.value.uid)),
       )
       const querySnapshot = await getDocs(q, limit(1))
       querySnapshot.forEach((doc) => {
@@ -285,7 +262,7 @@ export const useCalendarStore = defineStore('calendar', () => {
           { cards },
           {
             merge: true,
-          }
+          },
         )
       } catch (error) {
         setSnackBarMessage(error.message, 'error')
@@ -303,5 +280,10 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
-  return { currentWeek, calendar, setup, addWeek }
+  return {
+    currentWeek,
+    calendar,
+    setup,
+    addWeek,
+  }
 })

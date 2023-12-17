@@ -5,10 +5,7 @@
         <v-img
           aspect-ratio="16/9"
           cover
-          :src="
-            currentDish.photo ||
-            'https://placehold.co/3840x2160.png?text=Good+Food'
-          "
+          :src="currentDish.photo || 'https://placehold.co/3840x2160.png?text=Good+Food'"
           class="text-right pa-2"
         >
           <v-btn
@@ -29,20 +26,14 @@
         <v-list-item-title class="text-h6 text-md-h5 text-lg-h4">
           {{ currentDish.name }}
         </v-list-item-title>
-        <v-chip-group
-          multiple
-          selected-class="text-primary"
-          v-model="selection"
-        >
+        <v-chip-group v-model="selection" multiple selected-class="text-primary">
           <v-chip v-for="filter in currentDish.filters" :key="filter">
             {{ filter }}
           </v-chip>
         </v-chip-group>
         <div class="d-flex py-3 justify-space-between">
           <v-list-item density="compact" prepend-icon="mdi-account-multiple">
-            <v-list-item-subtitle>{{
-              currentDish.portion
-            }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ currentDish.portion }}</v-list-item-subtitle>
           </v-list-item>
           <v-divider vertical />
           <v-list-item density="compact" prepend-icon="mdi-clock-time-five">
@@ -54,16 +45,9 @@
           </v-list-item>
         </div>
 
-        <v-chip-group
-          multiple
-          selected-class="text-primary"
-          v-model="selection"
-        >
+        <v-chip-group v-model="selection" multiple selected-class="text-primary">
           <v-chip v-for="ingr in currentDish.ingredients" :key="ingr.title">
-            {{
-              `${ingr.amount ? ingr.amount + ingr.unitName || '' : ''} ` +
-              ingr.title
-            }}
+            {{ `${ingr.amount ? ingr.amount + ingr.unitName || '' : ''} ` + ingr.title }}
           </v-chip>
         </v-chip-group>
         <v-list-item-subtitle class="keep-line-break">

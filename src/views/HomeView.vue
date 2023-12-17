@@ -8,12 +8,12 @@
         :routing="routing"
       >
         <v-text-field
+          v-model="searchText"
           :loading="loading"
           density="compact"
           variant="solo"
           label="Search"
           append-inner-icon="mdi-magnify"
-          v-model="searchText"
           single-line
           hide-details
           @click:append-inner="search"
@@ -34,11 +34,7 @@
     <v-row align="center" justify="space-between" variant="solo">
       <v-col cols="auto">
         <span class="subheading">Quick filters</span>
-        <v-chip-group
-          multiple
-          selected-class="text-primary"
-          v-model="selection"
-        >
+        <v-chip-group v-model="selection" multiple selected-class="text-primary">
           <v-chip v-for="tag in tags" :key="tag">
             {{ tag }}
           </v-chip>
@@ -83,15 +79,7 @@ const onInput = async () => {
   }
 }
 const selection = ref([])
-const tags = ref([
-  'spicy',
-  'chicken',
-  'vegatables',
-  'quick',
-  'breakfast',
-  'dinner',
-  'soup',
-])
+const tags = ref(['spicy', 'chicken', 'vegatables', 'quick', 'breakfast', 'dinner', 'soup'])
 const searchText = ref('')
 const { getDishes } = store
 watch(selection, async (selection) => {

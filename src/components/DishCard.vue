@@ -3,10 +3,7 @@
     <v-img
       class="align-end text-white"
       height="200"
-      :src="
-        props.details.photo ||
-        'https://placehold.co/3840x2160.png?text=Good+Food'
-      "
+      :src="props.details.photo || 'https://placehold.co/3840x2160.png?text=Good+Food'"
       cover
     >
       <v-btn
@@ -63,6 +60,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useDishStore } from '@store'
+
 const { updateDishField } = useDishStore()
 
 const props = defineProps(['details'])
