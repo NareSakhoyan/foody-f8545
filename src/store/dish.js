@@ -19,7 +19,6 @@ const storage = getStorage()
 
 export const useDishStore = defineStore('dish', {
   state: () => ({
-    user: null,
     dishes: [],
     filters: [],
     allIngredients: [],

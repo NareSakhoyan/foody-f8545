@@ -74,9 +74,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, defineEmits, watch } from 'vue'
 import { useAuthStore } from '@store/app'
 import { storeToRefs } from 'pinia'
+import { useModal } from '@src/plugins/ModalPlugin.js'
+
+const $modal = useModal()
 
 const store = useAuthStore()
 const { user } = storeToRefs(store)
@@ -88,10 +91,13 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 
+const emit = defineEmits(['confirm', 'cancel'])
+
 const signIn = async () => {
   try {
     await store.login(email.value, password.value)
     loginOverlay.value = false
+    emit('confirm')
   } catch (error) {
     console.log(error)
   }
@@ -101,6 +107,7 @@ const signUp = async () => {
   try {
     await store.signUp(name.value, email.value, password.value)
     loginOverlay.value = false
+    emit('confirm')
   } catch (error) {
     console.log(error)
   }
@@ -113,6 +120,13 @@ const logOut = async () => {
     console.log(error)
   }
 }
+watch(
+  $modal,
+  (value) => {
+    loginOverlay.value = value
+  },
+  { deep: true },
+)
 
 onMounted(async () => {
   const unsubscribe = await store.setup()

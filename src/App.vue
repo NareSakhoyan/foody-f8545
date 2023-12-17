@@ -45,7 +45,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main class="flex align-center justify-center">
+    <v-main class="flex align-center justify-center" v-if="!loading">
       <router-view v-slot="{ Component }">
         <keep-alive include="Calendar,HomeView">
           <component :is="Component" />
@@ -106,7 +106,9 @@ const onResize = () => {
 
 onBeforeMount(async () => {
   await authStore.setup()
-  await dishStore.setup()
+  authStore.$subscribe(async (newState) => {
+    if (newState.user != null) await dishStore.setup()
+  })
   window.addEventListener('resize', onResize)
 })
 

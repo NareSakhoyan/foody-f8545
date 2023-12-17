@@ -14,7 +14,10 @@ export const useAppStore = defineStore('app', {
     loading: true,
   }),
   actions: {
-    async setup() {},
+    setup() {},
+    setLoading(value) {
+      this.loading = value
+    },
   },
 })
 
@@ -23,7 +26,6 @@ export const useSnackbarStore = defineStore('snackbar', {
     text: '',
     type: '',
     status: false,
-    loading: false,
   }),
   actions: {
     setMessage(text, type) {
@@ -44,7 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setup = async () => {
     const result = await auth.onAuthStateChanged((firebaseUser) => {
       user.value = firebaseUser
-      if (firebaseUser) appStore.loading = !appStore.loading
+      if (firebaseUser) appStore.setLoading(false)
     })
     return result
   }

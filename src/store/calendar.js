@@ -13,51 +13,33 @@ import {
 } from 'firebase/firestore'
 import { db } from '@src/firebase.js'
 import { useSnackbarStore, useAuthStore } from './app'
+import { getStartDateOfThisWeek, generateCurrentWeek } from '@src/utils'
 
 export const useCalendarStore = defineStore('calendar', () => {
   const authStore = useAuthStore()
   const currentWeek = ref([])
-  const currentWeekStart = ref(null)
+  const currentWeekId = ref()
+  const currentWeekStart = ref(getStartDateOfThisWeek())
   const calendar = ref([])
   const { user } = storeToRefs(authStore)
 
   const setup = async () => {
     try {
-      // find the first day of this week
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const currentDay = today.getDay()
-      const startDate = new Date(today)
-      startDate.setDate(today.getDate() - currentDay + 1)
-
-      currentWeekStart.value = startDate
-
       const q = query(
         collection(db, 'calendar'),
-        and(where('key', '==', (startDate / 1000) | 0), where('user', '==', user.value.uid)),
+        and(
+          where('key', '==', (currentWeekStart.value / 1000) | 0),
+          where('user', '==', user.value.uid),
+        ),
       )
+
       const querySnapshot = await getDocs(q, limit(1))
       querySnapshot.forEach((doc) => {
         currentWeek.value = { id: doc.id, ...doc.data() }
+        currentWeekId.value = doc.id
       })
-      if (!currentWeek?.value) {
-        const generateCurrentWeek = () => {
-          const today = new Date()
-          today.setHours(0, 0, 0, 0)
-          const currentDay = today.getDay()
-          const startDate = new Date(today)
-          startDate.setDate(today.getDate() - currentDay + 1) // Start from Monday
 
-          const weekDates = []
-
-          for (let i = 0; i < 7; i++) {
-            const currentDate = new Date(startDate)
-            currentDate.setDate(startDate.getDate() + i)
-            weekDates.push(currentDate)
-          }
-          return weekDates
-        }
-
+      if (!(currentWeek.value && Object.keys(currentWeek.value).length)) {
         currentWeek.value = generateCurrentWeek()
       }
     } catch (error) {
@@ -65,10 +47,10 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
   const addWeek = async (cards) => {
-    if (currentWeek?.value?.id) {
+    if (currentWeekId.value) {
       try {
         await setDoc(
-          doc(db, 'calendar', currentWeek.value.id),
+          doc(db, 'calendar', currentWeekId.value),
           { cards },
           {
             merge: true,
@@ -79,11 +61,17 @@ export const useCalendarStore = defineStore('calendar', () => {
       }
     } else {
       try {
-        await addDoc(collection(db, 'calendar'), {
+        const docRef = await addDoc(collection(db, 'calendar'), {
           key: (currentWeekStart.value / 1000) | 0,
           cards,
           user: user.value.uid,
         })
+        currentWeek.value = {
+          key: (currentWeekStart.value / 1000) | 0,
+          cards,
+          user: user.value.uid,
+        }
+        currentWeekId.value = docRef.id
       } catch (error) {
         useSnackbarStore().setMessage(error.message, 'error')
       }
@@ -92,6 +80,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   return {
     currentWeek,
+    currentWeekId,
     calendar,
     setup,
     addWeek,

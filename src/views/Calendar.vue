@@ -141,10 +141,10 @@
   </v-dialog>
 </template>
 <script setup>
-import { ref, reactive, watch, toRaw, onActivated, onDeactivated } from 'vue'
+import { ref, reactive, watch, toRaw, onActivated, onDeactivated, onBeforeMount } from 'vue'
 import VueDraggable from 'vuedraggable'
 import CalendarCard from '@components/CalendarCard.vue'
-import { useSnackbarStore } from '@store/app'
+import { useAppStore } from '@store/app'
 import { useCalendarStore } from '@store/calendar'
 import { useDishStore } from '@store/dish'
 import { storeToRefs } from 'pinia'
@@ -158,14 +158,18 @@ onActivated(() => {
 
 onDeactivated(() => {})
 
+onBeforeMount(async () => {
+  await calendarStore.setup()
+})
+
 const calendarStore = useCalendarStore()
-const snackBarStore = useSnackbarStore()
+const appStore = useAppStore()
 const dishStore = useDishStore()
 
 const { addWeek } = calendarStore
-const { loading } = storeToRefs(snackBarStore)
+const { loading } = storeToRefs(appStore)
 const { dishes } = storeToRefs(dishStore)
-const { currentWeek } = storeToRefs(calendarStore)
+const { currentWeek, currentWeekId } = storeToRefs(calendarStore)
 
 const days = ref(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
 const columns = reactive([])
@@ -173,7 +177,15 @@ const columns = reactive([])
 watch(
   loading,
   async () => {
-    await calendarStore.setup()
+    parseCards(currentWeek.value.cards)
+  },
+  { deep: true },
+)
+
+// TODO: find a better way to update cards when first adding a new one
+watch(
+  currentWeekId,
+  async () => {
     parseCards(currentWeek.value.cards)
   },
   { deep: true },
