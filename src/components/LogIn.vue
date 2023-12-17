@@ -75,7 +75,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useAuthStore } from '@store'
+import { useAuthStore } from '@store/app'
 import { storeToRefs } from 'pinia'
 
 const store = useAuthStore()

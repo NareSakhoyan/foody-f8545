@@ -10,10 +10,10 @@
   </div>
 </template>
 <script setup>
-import { useSnackBar } from '@store'
+import { useSnackbarStore } from '@store/app'
 import { storeToRefs } from 'pinia'
 
-const store = useSnackBar()
+const store = useSnackbarStore()
 const { text, type, status } = storeToRefs(store)
 const { closeSnackBar } = store
 </script>

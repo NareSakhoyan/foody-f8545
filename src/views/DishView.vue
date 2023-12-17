@@ -81,7 +81,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useDishStore } from '@store'
+import { useDishStore } from '@store/dish'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 

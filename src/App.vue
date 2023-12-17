@@ -44,6 +44,7 @@
         ></v-list-item>
       </v-list>
     </v-navigation-drawer>
+
     <v-main class="flex align-center justify-center">
       <router-view v-slot="{ Component }">
         <keep-alive include="Calendar,HomeView">
@@ -52,7 +53,9 @@
       </router-view>
       <SnackBar />
     </v-main>
-
+    <v-overlay :model-value="loading" class="align-center justify-center">
+      <v-progress-circular color="primary" indeterminate size="64"></v-progress-circular>
+    </v-overlay>
     <v-bottom-navigation v-if="windowWidth < 1024">
       <v-btn v-for="m in menu" :key="m.id" :value="m.id" @click="router.push('/' + m.id)">
         <v-icon>{{ m.icon }}</v-icon>
@@ -71,7 +74,8 @@ import { RouterView, useRouter } from 'vue-router'
 import Login from '@components/LogIn.vue'
 import SnackBar from '@components/SnackBar.vue'
 // import SideBar from '@components/SideBar.vue'
-import { useAuthStore, useDishStore } from '@store'
+import { useAuthStore, useAppStore } from '@store/app'
+import { useDishStore } from '@store/dish'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
@@ -87,10 +91,12 @@ const menu = ref([
   { id: 'inventory', name: 'Inventory', icon: 'mdi-format-list-checks' },
 ])
 
-const { currentUser } = storeToRefs(useAuthStore())
-
 const dishStore = useDishStore()
 const authStore = useAuthStore()
+const appStore = useAppStore()
+
+const { currentUser } = storeToRefs(authStore)
+const { loading } = storeToRefs(appStore)
 
 watch(themeToggle, (value) => (theme.global.name.value = value ? 'light' : 'dark'))
 // TODO: change this to use Vuetify v-resize

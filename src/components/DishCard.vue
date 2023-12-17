@@ -59,7 +59,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { useDishStore } from '@store'
+import { useDishStore } from '@store/dish'
 
 const { updateDishField } = useDishStore()
 

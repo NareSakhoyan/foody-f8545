@@ -144,7 +144,9 @@
 import { ref, reactive, watch, toRaw, onActivated, onDeactivated } from 'vue'
 import VueDraggable from 'vuedraggable'
 import CalendarCard from '@components/CalendarCard.vue'
-import { useCalendarStore, useSnackBar, useDishStore } from '@store'
+import { useSnackbarStore } from '@store/app'
+import { useCalendarStore } from '@store/calendar'
+import { useDishStore } from '@store/dish'
 import { storeToRefs } from 'pinia'
 
 onActivated(() => {
@@ -157,7 +159,7 @@ onActivated(() => {
 onDeactivated(() => {})
 
 const calendarStore = useCalendarStore()
-const snackBarStore = useSnackBar()
+const snackBarStore = useSnackbarStore()
 const dishStore = useDishStore()
 
 const { addWeek } = calendarStore

@@ -11,13 +11,11 @@ import { aliases, mdi } from 'vuetify/lib/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 
-import { createPinia } from 'pinia'
 import InstantSearch from 'vue-instantsearch/vue3/es'
 import { firebaseApp } from './firebase'
 import router from './router'
 import App from './App.vue'
-
-const pinia = createPinia()
+import { pinia } from '@store'
 
 const vuetify = createVuetify({
   theme: {

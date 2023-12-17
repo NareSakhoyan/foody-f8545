@@ -134,7 +134,8 @@
 
 import { ref, onMounted, watch } from 'vue'
 import { deepUnref } from 'vue-deepunref'
-import { useDishStore, useAuthStore } from '@store'
+import { useAuthStore } from '@store/app'
+import { useDishStore } from '@store/dish'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
