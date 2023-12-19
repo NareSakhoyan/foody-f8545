@@ -10,12 +10,9 @@ import {
   addDoc,
   setDoc,
 } from 'firebase/firestore'
-import { getStorage, ref as firebaseRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db } from '@src/firebase.js'
 import { index } from '@src/query'
 import { useSnackbarStore } from './app'
-
-const storage = getStorage()
 
 export const useDishStore = defineStore('dish', {
   state: () => ({
@@ -120,17 +117,6 @@ export const useDishStore = defineStore('dish', {
     async updateDishField(id, data) {
       try {
         await setDoc(doc(db, 'dishes', id), data, { merge: true })
-      } catch (error) {
-        useSnackbarStore().setMessage(error.message, 'error')
-      }
-    },
-    async uploadPhoto(photoToUpload) {
-      if (!photoToUpload) return null
-      const storageRef = firebaseRef(storage, `${photoToUpload.name}`)
-      try {
-        await uploadBytes(storageRef, photoToUpload)
-        const downloadURL = await getDownloadURL(storageRef)
-        return downloadURL
       } catch (error) {
         useSnackbarStore().setMessage(error.message, 'error')
       }

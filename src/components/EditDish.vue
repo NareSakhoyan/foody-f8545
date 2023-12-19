@@ -1,21 +1,10 @@
 <template>
   <v-container>
     <v-form ref="form">
-      <v-img
-        v-if="photo || currentDish.photo"
-        class="mx-auto"
-        height="300"
-        lazy-src="https://placehold.co/3840x2160.png?text=Good+Food"
-        max-width="500"
-        :src="downloadURL"
-      >
-        <template #placeholder>
-          <div class="d-flex align-center justify-center fill-height">
-            <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
-          </div>
-        </template>
-      </v-img>
-      <v-file-input v-model="photo" label="Photo" prepend-icon="mdi-camera" @change="photoInput" />
+      <UploadPhoto
+        :photoURL="currentDish.photo"
+        @url="(photoURL) => (currentDish.photo = photoURL)"
+      />
       <v-text-field
         v-model="currentDish.name"
         label="What's the name?"
@@ -32,7 +21,7 @@
         v-model="ingredients"
         v-model:search="searchIngredient"
         :hide-no-data="false"
-        :items="allIngredients"
+        :items="allIngredients.map(({ name }) => name).filter((item) => item)"
         hide-selected
         label="Ingredients"
         multiple
@@ -136,15 +125,18 @@ import { ref, onMounted, watch } from 'vue'
 import { deepUnref } from 'vue-deepunref'
 import { useAuthStore } from '@store/app'
 import { useDishStore } from '@store/dish'
+import { useIngredientsStore } from '@store/ingredients'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
+import UploadPhoto from './UploadPhoto.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const store = useDishStore()
-const { getDish, addDish, updateDish, uploadPhoto } = store
-const { currentDish, allIngredients } = storeToRefs(store)
+const { getDish, addDish, updateDish } = store
+const { currentDish } = storeToRefs(store)
+const { allIngredients } = storeToRefs(useIngredientsStore())
 
 const authStore = useAuthStore()
 const { user } = storeToRefs(authStore)
@@ -166,13 +158,10 @@ const ingredients = ref([])
 const searchIngredient = ref('')
 const searchfilter = ref('')
 const editPageId = route.params.dish
-const photo = ref('')
-const downloadURL = ref('')
 
 onMounted(async () => {
   if (editPageId) {
     await getDish(route.params.dish)
-    downloadURL.value = currentDish.value.photo
     ingredients.value = currentDish.value.ingredients
   }
 })
@@ -182,7 +171,6 @@ const saveDish = async () => {
   if (!valid) return
 
   currentDish.value.user = user.value.uid
-  currentDish.value.photo = downloadURL.value
   currentDish.value.ingredients = ingredients
   currentDish.value.cost = parseInt(currentDish.value.cost) || 0
   if (editPageId) {
@@ -192,11 +180,6 @@ const saveDish = async () => {
   }
   store.$reset()
   router.push('/')
-}
-
-const photoInput = async () => {
-  if (!photo?.value[0]) return null
-  downloadURL.value = await uploadPhoto(photo?.value[0])
 }
 
 // When an ingredient is added, its value is changed to an object containing the amount and unit name properties.

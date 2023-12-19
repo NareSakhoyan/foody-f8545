@@ -8,6 +8,8 @@ import {
   updateProfile,
 } from 'firebase/auth'
 import { auth } from '@src/firebase.js'
+import { ref as firebaseRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@src/firebase.js'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -17,6 +19,17 @@ export const useAppStore = defineStore('app', {
     setup() {},
     setLoading(value) {
       this.loading = value
+    },
+    async uploadPhoto(photoToUpload) {
+      if (!photoToUpload) return null
+      const storageRef = firebaseRef(storage, `${photoToUpload.name}`)
+      try {
+        await uploadBytes(storageRef, photoToUpload)
+        const downloadURL = await getDownloadURL(storageRef)
+        return downloadURL
+      } catch (error) {
+        useSnackbarStore().setMessage(error.message, 'error')
+      }
     },
   },
 })
