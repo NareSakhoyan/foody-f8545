@@ -1,6 +1,6 @@
 # foody
-
-This template should help get you started developing with Vue 3 in Vite.
+This is available at https://foody-f8545.web.app/
+The rest is auto-generated, wouldn't recommend reading
 
 ## Recommended IDE Setup
 
