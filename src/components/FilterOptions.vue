@@ -1,7 +1,7 @@
 <template>
   <div class="text-center">
     <v-menu v-model="menu" :close-on-content-click="false" location="start">
-      <template v-slot:activator="{ props }">
+      <template #activator="{ props }">
         <v-btn class="ma-2" v-bind="props">
           <v-icon start icon="mdi-filter"></v-icon>
           Filters
@@ -46,9 +46,7 @@
                 tick-size="2"
                 thumb-label="always"
               >
-                <template v-slot:thumb-label="{ modelValue }">
-                  {{ modelValue }} mnts
-                </template>
+                <template #thumb-label="{ modelValue }"> {{ modelValue }} mnts </template>
               </v-slider>
             </v-list-item>
           </v-list>
@@ -79,7 +77,7 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { deepUnref } from 'vue-deepunref'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store/dish'
 
 const store = useDishStore()
 const { getDishes } = store

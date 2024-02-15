@@ -8,12 +8,12 @@
         :routing="routing"
       >
         <v-text-field
+          v-model="searchText"
           :loading="loading"
           density="compact"
           variant="solo"
           label="Search"
           append-inner-icon="mdi-magnify"
-          v-model="searchText"
           single-line
           hide-details
           @click:append-inner="search"
@@ -34,11 +34,7 @@
     <v-row align="center" justify="space-between" variant="solo">
       <v-col cols="auto">
         <span class="subheading">Quick filters</span>
-        <v-chip-group
-          multiple
-          selected-class="text-primary"
-          v-model="selection"
-        >
+        <v-chip-group v-model="selection" multiple selected-class="text-primary">
           <v-chip v-for="tag in tags" :key="tag">
             {{ tag }}
           </v-chip>
@@ -55,11 +51,11 @@ import { ref, watch } from 'vue'
 import { deepUnref } from 'vue-deepunref'
 import Filters from '@components/FilterOptions.vue'
 import DishList from '@components/DishList.vue'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store/dish'
 import { history } from 'instantsearch.js/es/lib/routers'
 import { singleIndex } from 'instantsearch.js/es/lib/stateMappings'
-import router from '@/router'
-import { searchClient, index } from '@/query'
+import router from '@src/router'
+import { searchClient, index } from '@src/query'
 
 const routing = {
   router: history(),
@@ -83,22 +79,13 @@ const onInput = async () => {
   }
 }
 const selection = ref([])
-const tags = ref([
-  'spicy',
-  'chicken',
-  'vegatables',
-  'quick',
-  'breakfast',
-  'dinner',
-  'soup',
-])
+const tags = ref(['spicy', 'chicken', 'vegatables', 'quick', 'breakfast', 'dinner', 'soup'])
 const searchText = ref('')
 const { getDishes } = store
 watch(selection, async (selection) => {
   const quickFilters = deepUnref(selection).map((item) => tags.value[item])
   getDishes({ quickFilters })
 })
-
 const search = () => {
   searchClient.$ais.currentRefinement = searchText
 }

@@ -1,9 +1,6 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-import { firebaseApp } from './firebase'
 
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -14,10 +11,12 @@ import { aliases, mdi } from 'vuetify/lib/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 
-import { createPinia } from 'pinia'
 import InstantSearch from 'vue-instantsearch/vue3/es'
-
-const pinia = createPinia()
+import { firebaseApp } from './firebase'
+import router from './router'
+import App from './App.vue'
+import { pinia } from '@store'
+import { install as installModalPlugin } from './plugins/ModalPlugin'
 
 const vuetify = createVuetify({
   theme: {
@@ -44,10 +43,11 @@ const vuetify = createVuetify({
 
 const app = createApp(App)
 
+app.use(pinia)
 app.use(firebaseApp)
 app.use(router)
 app.use(vuetify)
-app.use(pinia)
 app.use(InstantSearch)
+app.use(installModalPlugin)
 
 app.mount('#app')

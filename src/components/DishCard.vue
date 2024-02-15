@@ -3,10 +3,7 @@
     <v-img
       class="align-end text-white"
       height="200"
-      :src="
-        props.details.photo ||
-        'https://placehold.co/3840x2160.png?text=Good+Food'
-      "
+      :src="props.details.photo || 'https://placehold.co/3840x2160.png?text=Good+Food'"
       cover
     >
       <v-btn
@@ -19,10 +16,10 @@
             })
         "
       ></v-btn>
-      <v-card-title>{{ props.details.name }}</v-card-title>
+      <v-card-title class="title">{{ props.details.name }}</v-card-title>
     </v-img>
 
-    <v-card-text class="py-0">
+    <v-card-text class="pt-2 pb-0">
       {{ props.details.ingredients?.map(({ title }) => title).join(', ') }}
     </v-card-text>
 
@@ -53,7 +50,7 @@
       <v-btn size="small" :to="`/dish/${props.details.id}`"> More </v-btn>
       <v-spacer></v-spacer>
       <v-btn
-        v-if="props.details.proces"
+        v-if="props.details.process"
         :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
         @click="show = !show"
       ></v-btn>
@@ -62,7 +59,8 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { useDishStore } from '@/store'
+import { useDishStore } from '@store/dish'
+
 const { updateDishField } = useDishStore()
 
 const props = defineProps(['details'])
@@ -75,5 +73,8 @@ const show = ref(false)
   right: 0;
   margin: 0.5rem;
   z-index: 1;
+}
+.title {
+  background-color: #0006;
 }
 </style>
